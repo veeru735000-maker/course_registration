@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CourseHub — Add New Course</title>
+  <meta name="description" content="Register a new course into the CourseHub management system.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar" id="mainNavbar">
+    <div class="container nav-container">
+      <a href="/index.html" class="brand">
+        <img src="/images/logo.png" alt="CourseHub Logo" class="brand-logo-img" onerror="this.style.display='none'; document.getElementById('fallbackIcon').style.display='inline-block';">
+        <i class="fa-solid fa-graduation-cap" id="fallbackIcon" style="display:none; font-size: 1.8rem; color: var(--sunset-orange);"></i>
+        <div class="brand-text">
+          <span class="brand-title">CourseHub</span>
+          <span class="brand-subtitle">Registration System</span>
+        </div>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinksList">
+        <li><a href="/index.html" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="/add-course.html" class="nav-link active"><i class="fa-solid fa-plus-circle"></i> Add Course</a></li>
+        <li><a href="/view-courses.html" class="nav-link"><i class="fa-solid fa-table-list"></i> View Courses</a></li>
+        <li><a href="/update-course.html" class="nav-link"><i class="fa-solid fa-pen-to-square"></i> Update Course</a></li>
+        <li><a href="/delete-course.html" class="nav-link"><i class="fa-solid fa-trash-can"></i> Delete Course</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container" style="flex: 1; padding-bottom: 3rem;">
+
+    <!-- Page Header -->
+    <header class="page-header">
+      <div class="page-header-row">
+        <div>
+          <h1 class="page-title"><i class="fa-solid fa-circle-plus" style="color: var(--accent-teal);"></i> Add New Course</h1>
+          <p class="page-subtitle">Fill in the course details below to register a new course in the curriculum database.</p>
+        </div>
+        <div>
+          <a href="/view-courses.html" class="btn btn-secondary">
+            <i class="fa-solid fa-table-list"></i> View All Courses
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Feedback Message Alert Boxes -->
+    <div id="alertSuccess" class="alert alert-success hidden" role="alert">
+      <i class="fa-solid fa-circle-check alert-icon"></i>
+      <div id="alertSuccessMsg">Course has been registered successfully!</div>
+    </div>
+
+    <div id="alertError" class="alert alert-danger hidden" role="alert">
+      <i class="fa-solid fa-circle-exclamation alert-icon"></i>
+      <div id="alertErrorMsg">Failed to register course. Please review the form.</div>
+    </div>
+
+    <!-- Registration Card Form -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2.5rem auto;">
+      <form id="addCourseForm" novalidate>
+        
+        <div class="form-grid">
+          
+          <!-- Course ID (Optional if Auto-Increment) -->
+          <div class="form-group form-group-full">
+            <label for="course_id" class="form-label">
+              <span>Course ID <span class="form-hint">(Optional — Leave blank if using AUTO_INCREMENT)</span></span>
+            </label>
+            <input 
+              type="text" 
+              id="course_id" 
+              name="course_id" 
+              class="input-control" 
+              placeholder="e.g. 101 or CS101 (or leave blank if your database auto-increments)"
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- Course Name -->
+          <div class="form-group form-group-full">
+            <label for="course_name" class="form-label">
+              <span>Course Name <span class="required-badge">*</span></span>
+              <span class="form-hint">Full title of the curriculum course</span>
+            </label>
+            <input 
+              type="text" 
+              id="course_name" 
+              name="course_name" 
+              class="input-control" 
+              placeholder="e.g. Data Structures & Algorithms" 
+              required
+              autocomplete="off"
+            >
+          </div>
+
+          <!-- Course Credits -->
+          <div class="form-group">
+            <label for="course_creidts" class="form-label">
+              <span>Course Credits <span class="required-badge">*</span></span>
+              <span class="form-hint">Credit value (1 - 6)</span>
+            </label>
+            <input 
+              type="number" 
+              id="course_creidts" 
+              name="course_creidts" 
+              class="input-control" 
+              placeholder="e.g. 3" 
+              min="1" 
+              max="20" 
+              step="1" 
+              required
+            >
+          </div>
+
+          <!-- Course Department -->
+          <div class="form-group">
+            <label for="course_dept" class="form-label">
+              <span>Department <span class="required-badge">*</span></span>
+              <span class="form-hint">e.g. cse, ai, ece, Computer Science</span>
+            </label>
+            <input 
+              type="text" 
+              id="course_dept" 
+              name="course_dept" 
+              list="deptList" 
+              class="input-control" 
+              placeholder="e.g. cse, ece, ai, Computer Science" 
+              required
+            >
+            <datalist id="deptList">
+              <option value="cse">
+              <option value="ece">
+              <option value="eee">
+              <option value="ai">
+              <option value="csed">
+              <option value="ce">
+              <option value="cyber">
+              <option value="Computer Science">
+              <option value="Information Technology">
+              <option value="Electrical Engineering">
+              <option value="Mechanical Engineering">
+              <option value="Civil Engineering">
+            </datalist>
+          </div>
+
+          <!-- Course Semester -->
+          <div class="form-group form-group-full">
+            <label for="course_semister" class="form-label">
+              <span>Semester <span class="required-badge">*</span></span>
+              <span class="form-hint">e.g. 1, 2, 3, 4, 5, 6, 7, 8 or Semester 1</span>
+            </label>
+            <input 
+              type="text" 
+              id="course_semister" 
+              name="course_semister" 
+              list="semList" 
+              class="input-control" 
+              placeholder="e.g. 6 (or Semester 6)" 
+              required
+            >
+            <datalist id="semList">
+              <option value="1">
+              <option value="2">
+              <option value="3">
+              <option value="4">
+              <option value="5">
+              <option value="6">
+              <option value="7">
+              <option value="8">
+              <option value="Semester 1">
+              <option value="Semester 2">
+              <option value="Semester 3">
+              <option value="Semester 4">
+              <option value="Semester 5">
+              <option value="Semester 6">
+            </datalist>
+          </div>
+
+        </div>
+
+        <!-- Form Buttons -->
+        <div class="form-actions">
+          <button type="submit" id="submitBtn" class="btn btn-teal">
+            <i class="fa-solid fa-floppy-disk"></i> Save Course
+          </button>
+          <button type="reset" id="resetBtn" class="btn btn-secondary">
+            <i class="fa-solid fa-rotate-left"></i> Reset Form
+          </button>
+          <a href="/view-courses.html" class="btn btn-secondary" style="margin-left: auto;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Courses
+          </a>
+        </div>
+
+      </form>
+    </div>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <i class="fa-solid fa-graduation-cap"></i> CourseHub — Academic Course Management System
+      </div>
+      <div class="footer-status">
+        <span class="status-dot"></span>
+        <span>MySQL Database Connected</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Frontend Logic for Add Course -->
+  <script>
+    // Mobile navigation toggle
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinksList');
+    if (mobileBtn && navLinks) {
+      mobileBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('show-mobile');
+      });
+    }
+
+    const form = document.getElementById('addCourseForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertSuccessMsg = document.getElementById('alertSuccessMsg');
+    const alertError = document.getElementById('alertError');
+    const alertErrorMsg = document.getElementById('alertErrorMsg');
+
+    function hideAlerts() {
+      alertSuccess.classList.add('hidden');
+      alertError.classList.add('hidden');
+    }
+
+    function showError(message) {
+      alertErrorMsg.textContent = message;
+      alertError.classList.remove('hidden');
+      alertSuccess.classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showSuccess(message) {
+      alertSuccessMsg.textContent = message;
+      alertSuccess.classList.remove('hidden');
+      alertError.classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlerts();
+
+      // Collect form values
+      const courseIdVal = document.getElementById('course_id').value.trim();
+      const courseNameVal = document.getElementById('course_name').value.trim();
+      const courseCreditsVal = document.getElementById('course_creidts').value.trim();
+      const courseDeptVal = document.getElementById('course_dept').value;
+      const courseSemesterVal = document.getElementById('course_semister').value;
+
+      // Client-side validations
+      if (!courseNameVal) {
+        showError('Please enter a valid Course Name.');
+        return;
+      }
+      if (!courseCreditsVal || isNaN(courseCreditsVal) || Number(courseCreditsVal) <= 0) {
+        showError('Please enter a valid positive number for Course Credits.');
+        return;
+      }
+      if (!courseDeptVal) {
+        showError('Please select an Academic Department.');
+        return;
+      }
+      if (!courseSemesterVal) {
+        showError('Please select a Semester.');
+        return;
+      }
+
+      // Build payload matching exact database column names
+      const payload = {
+        course_name: courseNameVal,
+        course_creidts: Number(courseCreditsVal),
+        course_dept: courseDeptVal,
+        course_semister: courseSemesterVal
+      };
+
+      if (courseIdVal) {
+        payload.course_id = courseIdVal;
+      }
+
+      // Display loading state
+      const originalBtnHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving to MySQL...';
+
+      try {
+        const response = await fetch('/api/courses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Server returned error ' + response.status);
+        }
+
+        // Success: Clear form & display confirmation
+        form.reset();
+        showSuccess(`Course "${data.course ? data.course.course_name : courseNameVal}" (ID: ${data.course_id}) was saved successfully to MySQL!`);
+
+      } catch (err) {
+        console.error('Failed to add course:', err);
+        showError(err.message || 'Network error: Unable to contact server.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml;
+      }
+    });
+  </script>
+</body>
+</html>

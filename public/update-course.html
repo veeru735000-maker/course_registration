@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CourseHub — Update Course</title>
+  <meta name="description" content="Modify course specifications, credits, or department assignments.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="mainNavbar">
+    <div class="container nav-container">
+      <a href="/index.html" class="brand">
+        <img src="/images/logo.png" alt="CourseHub Logo" class="brand-logo-img" onerror="this.style.display='none'; document.getElementById('fallbackIcon').style.display='inline-block';">
+        <i class="fa-solid fa-graduation-cap" id="fallbackIcon" style="display:none; font-size: 1.8rem; color: var(--sunset-orange);"></i>
+        <div class="brand-text">
+          <span class="brand-title">CourseHub</span>
+          <span class="brand-subtitle">Registration System</span>
+        </div>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinksList">
+        <li><a href="/index.html" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="/add-course.html" class="nav-link"><i class="fa-solid fa-plus-circle"></i> Add Course</a></li>
+        <li><a href="/view-courses.html" class="nav-link"><i class="fa-solid fa-table-list"></i> View Courses</a></li>
+        <li><a href="/update-course.html" class="nav-link active"><i class="fa-solid fa-pen-to-square"></i> Update Course</a></li>
+        <li><a href="/delete-course.html" class="nav-link"><i class="fa-solid fa-trash-can"></i> Delete Course</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container" style="flex: 1; padding-bottom: 3rem;">
+
+    <!-- Page Header -->
+    <header class="page-header">
+      <div class="page-header-row">
+        <div>
+          <h1 class="page-title"><i class="fa-solid fa-pen-to-square" style="color: var(--sunset-orange);"></i> Update Course</h1>
+          <p class="page-subtitle">Select an existing course record via dropdown or ID lookup, then review and update its details in MySQL.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <a href="/view-courses.html" class="btn btn-secondary">
+            <i class="fa-solid fa-table-list"></i> View Catalog
+          </a>
+
+          <!-- Page Actions Dropdown Button -->
+          <div class="dropdown" id="pageActionsDropdown">
+            <button type="button" class="btn btn-sunset dropdown-toggle" id="pageActionsBtn" aria-expanded="false" aria-label="Page Actions">
+              <i class="fa-solid fa-bolt"></i> Actions <i class="fa-solid fa-chevron-down dropdown-chevron"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end" id="pageActionsMenu">
+              <div class="dropdown-header">Quick Navigation</div>
+              <a href="/view-courses.html" class="dropdown-item"><i class="fa-solid fa-table-list"></i> View All Courses</a>
+              <a href="/add-course.html" class="dropdown-item"><i class="fa-solid fa-plus-circle"></i> Add New Course</a>
+              <a href="/delete-course.html" class="dropdown-item dropdown-item-danger"><i class="fa-solid fa-trash-can"></i> Delete Course</a>
+              <div class="dropdown-divider"></div>
+              <button type="button" class="dropdown-item" id="refreshCatalogBtn"><i class="fa-solid fa-arrows-rotate"></i> Reload Courses</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Feedback Alerts -->
+    <div id="alertSuccess" class="alert alert-success hidden" role="alert">
+      <i class="fa-solid fa-circle-check alert-icon"></i>
+      <div id="alertSuccessMsg">Course updated successfully!</div>
+    </div>
+
+    <div id="alertError" class="alert alert-danger hidden" role="alert">
+      <i class="fa-solid fa-circle-exclamation alert-icon"></i>
+      <div id="alertErrorMsg">Failed to find or update course.</div>
+    </div>
+
+    <!-- Stage 1: Select or Search Course -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 1.5rem auto;">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-magnifying-glass"></i> Stage 1: Select Course to Update</h2>
+
+        <!-- Quick Pick Dropdown Button -->
+        <div class="dropdown" id="quickPickDropdown">
+          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" id="quickPickBtn" aria-expanded="false" title="Quick pick course from dropdown">
+            <i class="fa-solid fa-list-check"></i> Choose Course <i class="fa-solid fa-chevron-down dropdown-chevron"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end" id="quickPickMenu" style="max-height: 280px; overflow-y: auto; width: 280px;">
+            <div class="dropdown-header">Select Course to Update</div>
+            <div id="quickPickList">
+              <span style="padding: 0.6rem 1rem; color: var(--text-muted); font-size: 0.85rem; display: block;">Loading courses...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <!-- Primary Method: Course Dropdown Selector -->
+        <div class="form-group">
+          <label for="courseSelectDropdown" class="form-label">
+            <span><i class="fa-solid fa-caret-down" style="color: var(--sunset-orange);"></i> Select Course from Dropdown <span class="required-badge">*</span></span>
+            <span class="form-hint">Pick any course to auto-load details</span>
+          </label>
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <select id="courseSelectDropdown" class="select-control" style="flex: 1; min-width: 240px;">
+              <option value="">-- Choose a Course from Dropdown --</option>
+              <!-- Dynamically populated from /api/courses -->
+            </select>
+            <button type="button" id="loadCourseBtn" class="btn btn-sunset" style="height: 44px;">
+              <i class="fa-solid fa-arrow-down-long"></i> Load Details
+            </button>
+          </div>
+        </div>
+
+        <!-- Divider with Text -->
+        <div style="display: flex; align-items: center; gap: 1rem; color: var(--text-muted); font-size: 0.82rem; font-weight: 600;">
+          <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
+          <span>OR SEARCH BY COURSE ID</span>
+          <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
+        </div>
+
+        <!-- Secondary Method: Manual ID Input Form -->
+        <form id="searchCourseForm" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label for="lookupId" class="form-label">
+              <span>Enter Course ID</span>
+            </label>
+            <input 
+              type="text" 
+              id="lookupId" 
+              class="input-control" 
+              placeholder="e.g. 101 or CS101" 
+              autocomplete="off"
+            >
+          </div>
+          <button type="submit" id="searchBtn" class="btn btn-secondary" style="height: 44px;">
+            <i class="fa-solid fa-search"></i> Search ID
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- Loading Indicator for Lookup -->
+    <div id="lookupLoading" class="loading-indicator hidden">
+      <div class="spinner"></div>
+      <p>Looking up course in MySQL database...</p>
+    </div>
+
+    <!-- Stage 2: Course Information Edit Form -->
+    <div id="editFormContainer" class="card hidden" style="max-width: 800px; margin: 0 auto 2.5rem auto;">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-sliders"></i> Stage 2: Modify Course Details</h2>
+        <span class="badge badge-info" id="editingCourseBadge">Editing ID: -</span>
+      </div>
+
+      <form id="updateCourseForm" novalidate>
+        <div class="form-grid">
+
+          <!-- Course ID (Read-Only) -->
+          <div class="form-group form-group-full">
+            <label for="course_id" class="form-label">
+              <span>Course ID <span class="form-hint">(Primary Key — Read-Only)</span></span>
+            </label>
+            <input 
+              type="text" 
+              id="course_id" 
+              name="course_id" 
+              class="input-control" 
+              readonly 
+            >
+          </div>
+
+          <!-- Course Name -->
+          <div class="form-group form-group-full">
+            <label for="course_name" class="form-label">
+              <span>Course Name <span class="required-badge">*</span></span>
+            </label>
+            <input 
+              type="text" 
+              id="course_name" 
+              name="course_name" 
+              class="input-control" 
+              placeholder="e.g. Operating Systems" 
+              required
+            >
+          </div>
+
+          <!-- Course Credits -->
+          <div class="form-group">
+            <label for="course_creidts" class="form-label">
+              <span>Course Credits <span class="required-badge">*</span></span>
+            </label>
+            <input 
+              type="number" 
+              id="course_creidts" 
+              name="course_creidts" 
+              class="input-control" 
+              min="1" 
+              max="20" 
+              required
+            >
+          </div>
+
+          <!-- Course Department Dropdown -->
+          <div class="form-group">
+            <label for="course_dept" class="form-label">
+              <span>Department Dropdown <span class="required-badge">*</span></span>
+              <span class="form-hint">Choose academic department</span>
+            </label>
+            <select 
+              id="course_dept" 
+              name="course_dept" 
+              class="select-control" 
+              required
+            >
+              <option value="">-- Select Department --</option>
+              <option value="cse">CSE — Computer Science & Engineering</option>
+              <option value="ai">AI — Artificial Intelligence & ML</option>
+              <option value="ece">ECE — Electronics & Communication</option>
+              <option value="eee">EEE — Electrical & Electronics</option>
+              <option value="csed">CSED — Computer Science & Design</option>
+              <option value="ce">CE — Civil Engineering</option>
+              <option value="cyber">CYBER — Cyber Security</option>
+              <option value="all dep">ALL DEP — General / Interdisciplinary</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Computer Science">Computer Science</option>
+            </select>
+          </div>
+
+          <!-- Course Semester Dropdown -->
+          <div class="form-group form-group-full">
+            <label for="course_semister" class="form-label">
+              <span>Semester Dropdown <span class="required-badge">*</span></span>
+              <span class="form-hint">Select curriculum semester</span>
+            </label>
+            <select 
+              id="course_semister" 
+              name="course_semister" 
+              class="select-control" 
+              required
+            >
+              <option value="">-- Select Semester --</option>
+              <option value="1">Semester 1 (Year 1 - Term 1)</option>
+              <option value="2">Semester 2 (Year 1 - Term 2)</option>
+              <option value="3">Semester 3 (Year 2 - Term 1)</option>
+              <option value="4">Semester 4 (Year 2 - Term 2)</option>
+              <option value="5">Semester 5 (Year 3 - Term 1)</option>
+              <option value="6">Semester 6 (Year 3 - Term 2)</option>
+              <option value="7">Semester 7 (Year 4 - Term 1)</option>
+              <option value="8">Semester 8 (Year 4 - Term 2)</option>
+              <option value="12">Semester 12 (Special / Elective)</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="updateBtn" class="btn btn-teal">
+            <i class="fa-solid fa-floppy-disk"></i> Update Course
+          </button>
+          <a href="/view-courses.html" class="btn btn-secondary">
+            <i class="fa-solid fa-xmark"></i> Cancel
+          </a>
+          <a href="#" id="viewInListBtn" class="btn btn-secondary" style="margin-left: auto;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open In Catalog
+          </a>
+        </div>
+      </form>
+    </div>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <i class="fa-solid fa-graduation-cap"></i> CourseHub — Academic Course Management System
+      </div>
+      <div class="footer-status">
+        <span class="status-dot"></span>
+        <span>MySQL Database Connected</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Frontend Logic for Update Course -->
+  <script>
+    // Mobile navigation toggle
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinksList');
+    if (mobileBtn && navLinks) {
+      mobileBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('show-mobile');
+      });
+    }
+
+    // DOM Elements
+    const searchForm = document.getElementById('searchCourseForm');
+    const lookupIdInput = document.getElementById('lookupId');
+    const searchBtn = document.getElementById('searchBtn');
+    const lookupLoading = document.getElementById('lookupLoading');
+
+    const courseSelectDropdown = document.getElementById('courseSelectDropdown');
+    const loadCourseBtn = document.getElementById('loadCourseBtn');
+    const quickPickDropdown = document.getElementById('quickPickDropdown');
+    const quickPickBtn = document.getElementById('quickPickBtn');
+    const quickPickMenu = document.getElementById('quickPickMenu');
+    const quickPickList = document.getElementById('quickPickList');
+
+    const pageActionsDropdown = document.getElementById('pageActionsDropdown');
+    const pageActionsBtn = document.getElementById('pageActionsBtn');
+    const pageActionsMenu = document.getElementById('pageActionsMenu');
+    const refreshCatalogBtn = document.getElementById('refreshCatalogBtn');
+
+    const editFormContainer = document.getElementById('editFormContainer');
+    const updateCourseForm = document.getElementById('updateCourseForm');
+    const updateBtn = document.getElementById('updateBtn');
+    const editingCourseBadge = document.getElementById('editingCourseBadge');
+    const viewInListBtn = document.getElementById('viewInListBtn');
+
+    const courseIdInput = document.getElementById('course_id');
+    const courseNameInput = document.getElementById('course_name');
+    const courseCreditsInput = document.getElementById('course_creidts');
+    const courseDeptSelect = document.getElementById('course_dept');
+    const courseSemSelect = document.getElementById('course_semister');
+
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertSuccessMsg = document.getElementById('alertSuccessMsg');
+    const alertError = document.getElementById('alertError');
+    const alertErrorMsg = document.getElementById('alertErrorMsg');
+
+    let allAvailableCourses = [];
+
+    // Alert helpers
+    function hideAlerts() {
+      alertSuccess.classList.add('hidden');
+      alertError.classList.add('hidden');
+    }
+
+    function showError(message) {
+      alertErrorMsg.textContent = message;
+      alertError.classList.remove('hidden');
+      alertSuccess.classList.add('hidden');
+    }
+
+    function showSuccess(message) {
+      alertSuccessMsg.textContent = message;
+      alertSuccess.classList.remove('hidden');
+      alertError.classList.add('hidden');
+    }
+
+    // Dropdown toggles helper
+    function setupDropdown(toggleBtn, menuEl, containerEl) {
+      if (!toggleBtn || !containerEl) return;
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = containerEl.classList.contains('show') || containerEl.classList.contains('open');
+        closeAllDropdowns();
+        if (!isOpen) {
+          containerEl.classList.add('show', 'open');
+          toggleBtn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+
+    function closeAllDropdowns() {
+      document.querySelectorAll('.dropdown').forEach(d => {
+        d.classList.remove('show', 'open');
+        const btn = d.querySelector('.dropdown-toggle');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.dropdown')) {
+        closeAllDropdowns();
+      }
+    });
+
+    setupDropdown(pageActionsBtn, pageActionsMenu, pageActionsDropdown);
+    setupDropdown(quickPickBtn, quickPickMenu, quickPickDropdown);
+
+    // Fetch All Courses to populate Course Dropdowns
+    async function loadAllCoursesForDropdown() {
+      try {
+        const response = await fetch('/api/courses');
+        if (!response.ok) throw new Error('Could not retrieve courses list');
+        allAvailableCourses = await response.json();
+
+        // Populate <select id="courseSelectDropdown">
+        courseSelectDropdown.innerHTML = '<option value="">-- Choose a Course from Dropdown --</option>';
+        quickPickList.innerHTML = '';
+
+        if (allAvailableCourses.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = 'No courses currently registered';
+          opt.disabled = true;
+          courseSelectDropdown.appendChild(opt);
+
+          quickPickList.innerHTML = '<span style="padding: 0.6rem 1rem; color: var(--text-muted); font-size: 0.85rem; display: block;">No registered courses found</span>';
+          return;
+        }
+
+        allAvailableCourses.forEach(course => {
+          // Option for select
+          const option = document.createElement('option');
+          option.value = course.course_id;
+          option.textContent = `${course.course_id} — ${course.course_name} (${course.course_dept ? course.course_dept.toUpperCase() : 'N/A'}, Sem ${course.course_semister})`;
+          courseSelectDropdown.appendChild(option);
+
+          // Item for quick pick dropdown button menu
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'dropdown-item';
+          item.innerHTML = `<i class="fa-solid fa-book-bookmark"></i> <span><strong>${escapeHtml(course.course_id)}</strong>: ${escapeHtml(course.course_name)}</span>`;
+          item.addEventListener('click', () => {
+            lookupIdInput.value = course.course_id;
+            courseSelectDropdown.value = course.course_id;
+            closeAllDropdowns();
+            fetchCourseForUpdate(course.course_id);
+          });
+          quickPickList.appendChild(item);
+        });
+
+      } catch (err) {
+        console.error('Failed to load courses list for dropdown:', err);
+        quickPickList.innerHTML = '<span style="padding: 0.6rem 1rem; color: var(--danger-color); font-size: 0.85rem; display: block;">Failed to load course list</span>';
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Trigger update on selecting from dropdown
+    courseSelectDropdown.addEventListener('change', () => {
+      const selectedId = courseSelectDropdown.value;
+      if (selectedId) {
+        lookupIdInput.value = selectedId;
+        fetchCourseForUpdate(selectedId);
+      }
+    });
+
+    loadCourseBtn.addEventListener('click', () => {
+      const selectedId = courseSelectDropdown.value;
+      if (selectedId) {
+        lookupIdInput.value = selectedId;
+        fetchCourseForUpdate(selectedId);
+      } else {
+        showError('Please select a course from the dropdown first.');
+      }
+    });
+
+    if (refreshCatalogBtn) {
+      refreshCatalogBtn.addEventListener('click', () => {
+        closeAllDropdowns();
+        loadAllCoursesForDropdown();
+      });
+    }
+
+    // Lookup Course by ID
+    async function fetchCourseForUpdate(courseId) {
+      hideAlerts();
+      if (!courseId) {
+        showError('Please provide a valid Course ID to search.');
+        return;
+      }
+
+      lookupLoading.classList.remove('hidden');
+      editFormContainer.classList.add('hidden');
+      searchBtn.disabled = true;
+
+      try {
+        const response = await fetch(`/api/courses/${encodeURIComponent(courseId)}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || `Course ID '${courseId}' was not found in the database.`);
+        }
+
+        // Populate fields
+        courseIdInput.value = data.course_id;
+        courseNameInput.value = data.course_name;
+        courseCreditsInput.value = data.course_creidts;
+        
+        ensureSelectValue(courseDeptSelect, data.course_dept);
+        ensureSelectValue(courseSemSelect, String(data.course_semister));
+
+        editingCourseBadge.textContent = `Editing ID: ${data.course_id}`;
+        viewInListBtn.href = `/view-courses.html`;
+        editFormContainer.classList.remove('hidden');
+
+        // Sync dropdown selection if not already synced
+        if (courseSelectDropdown.value !== String(data.course_id)) {
+          courseSelectDropdown.value = String(data.course_id);
+        }
+
+        // Smooth scroll to edit form
+        editFormContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      } catch (err) {
+        console.error('Course lookup failed:', err);
+        showError(err.message);
+      } finally {
+        lookupLoading.classList.add('hidden');
+        searchBtn.disabled = false;
+      }
+    }
+
+    // Helper to ensure existing DB value appears in select dropdown
+    function ensureSelectValue(selectEl, value) {
+      if (!value) return;
+      const strVal = String(value).trim().toLowerCase();
+      let exists = false;
+      for (let i = 0; i < selectEl.options.length; i++) {
+        if (selectEl.options[i].value.trim().toLowerCase() === strVal) {
+          selectEl.selectedIndex = i;
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        const customOption = document.createElement('option');
+        customOption.value = value;
+        customOption.textContent = value;
+        customOption.selected = true;
+        selectEl.appendChild(customOption);
+      }
+    }
+
+    // Search submit listener
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = lookupIdInput.value.trim();
+      if (id) {
+        fetchCourseForUpdate(id);
+      } else {
+        showError('Please enter a Course ID to search.');
+      }
+    });
+
+    // Update submit listener
+    updateCourseForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlerts();
+
+      const courseId = courseIdInput.value.trim();
+      const courseName = courseNameInput.value.trim();
+      const courseCredits = courseCreditsInput.value.trim();
+      const courseDept = courseDeptSelect.value;
+      const courseSem = courseSemSelect.value;
+
+      if (!courseName) {
+        showError('Course Name cannot be empty.');
+        return;
+      }
+      if (!courseCredits || isNaN(courseCredits) || Number(courseCredits) <= 0) {
+        showError('Please enter a valid positive number for Credits.');
+        return;
+      }
+      if (!courseDept) {
+        showError('Please choose a Department from the dropdown.');
+        return;
+      }
+      if (!courseSem) {
+        showError('Please choose a Semester from the dropdown.');
+        return;
+      }
+
+      const payload = {
+        course_name: courseName,
+        course_creidts: Number(courseCredits),
+        course_dept: courseDept,
+        course_semister: courseSem
+      };
+
+      const originalBtnHtml = updateBtn.innerHTML;
+      updateBtn.disabled = true;
+      updateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving to MySQL...';
+
+      try {
+        const response = await fetch(`/api/courses/${encodeURIComponent(courseId)}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Server error updating course.');
+        }
+
+        showSuccess(`Course ID ${courseId} ("${courseName}") was updated successfully in MySQL!`);
+
+        // Refresh dropdowns so updated name/dept shows
+        loadAllCoursesForDropdown();
+
+      } catch (err) {
+        console.error('Update failed:', err);
+        showError(err.message || 'Network error updating course.');
+      } finally {
+        updateBtn.disabled = false;
+        updateBtn.innerHTML = originalBtnHtml;
+      }
+    });
+
+    // Handle query parameter ?id=... and load dropdown on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadAllCoursesForDropdown();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramId = urlParams.get('id');
+      if (paramId) {
+        lookupIdInput.value = paramId;
+        courseSelectDropdown.value = paramId;
+        fetchCourseForUpdate(paramId);
+      }
+    });
+  </script>
+</body>
+</html>

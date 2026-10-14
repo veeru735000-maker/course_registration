@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CourseHub — Course Registration Dashboard</title>
+  <meta name="description" content="Manage courses, departments, credits, and academic semesters in one unified dashboard.">
+  <link rel="stylesheet" href="/css/style.css">
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="mainNavbar">
+    <div class="container nav-container">
+      <a href="/index.html" class="brand" id="brandLogoLink">
+        <img src="/images/logo.png" alt="CourseHub Logo" class="brand-logo-img" id="navLogoImg" onerror="this.style.display='none'; document.getElementById('fallbackIcon').style.display='inline-block';">
+        <i class="fa-solid fa-graduation-cap" id="fallbackIcon" style="display:none; font-size: 1.8rem; color: var(--sunset-orange);"></i>
+        <div class="brand-text">
+          <span class="brand-title">CourseHub</span>
+          <span class="brand-subtitle">Registration System</span>
+        </div>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinksList">
+        <li><a href="/index.html" class="nav-link active" id="navDashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="/add-course.html" class="nav-link" id="navAddCourse"><i class="fa-solid fa-plus-circle"></i> Add Course</a></li>
+        <li><a href="/view-courses.html" class="nav-link" id="navViewCourses"><i class="fa-solid fa-table-list"></i> View Courses</a></li>
+        <li><a href="/update-course.html" class="nav-link" id="navUpdateCourse"><i class="fa-solid fa-pen-to-square"></i> Update Course</a></li>
+        <li><a href="/delete-course.html" class="nav-link" id="navDeleteCourse"><i class="fa-solid fa-trash-can"></i> Delete Course</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="container" style="flex: 1; padding-bottom: 3rem;">
+
+    <!-- Welcome Hero Section -->
+    <section class="dashboard-hero" id="dashboardHeroSection">
+      <div class="container dashboard-hero-content">
+        <div class="dashboard-badge">
+          <i class="fa-solid fa-building-columns"></i> Academic Administration Portal
+        </div>
+        <h1>Course Registration Dashboard</h1>
+        <p>Manage courses, departments, credits, and academic semesters in one place with real-time MySQL synchronization.</p>
+      </div>
+    </section>
+
+    <!-- Global API Notification Banner (if server connection issue) -->
+    <div id="statusAlert" class="alert alert-danger hidden" role="alert">
+      <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
+      <div id="statusAlertMessage">Unable to connect to MySQL backend server. Please verify database connection.</div>
+    </div>
+
+    <!-- Statistics Section -->
+    <section aria-labelledby="statsSectionHeading">
+      <div class="stats-grid" id="statsGrid">
+        
+        <!-- Total Courses -->
+        <article class="stat-card" id="cardTotalCourses">
+          <div class="stat-info">
+            <span class="stat-label">Total Courses</span>
+            <span class="stat-number" id="statTotalCourses"><i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem;"></i></span>
+          </div>
+          <div class="stat-icon-wrapper stat-icon-blue">
+            <i class="fa-solid fa-book-bookmark"></i>
+          </div>
+        </article>
+
+        <!-- Total Credits -->
+        <article class="stat-card" id="cardTotalCredits">
+          <div class="stat-info">
+            <span class="stat-label">Total Credits</span>
+            <span class="stat-number" id="statTotalCredits"><i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem;"></i></span>
+          </div>
+          <div class="stat-icon-wrapper stat-icon-teal">
+            <i class="fa-solid fa-award"></i>
+          </div>
+        </article>
+
+        <!-- Total Departments -->
+        <article class="stat-card" id="cardTotalDepts">
+          <div class="stat-info">
+            <span class="stat-label">Departments</span>
+            <span class="stat-number" id="statTotalDepartments"><i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem;"></i></span>
+          </div>
+          <div class="stat-icon-wrapper stat-icon-indigo">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+        </article>
+
+        <!-- Total Semesters -->
+        <article class="stat-card" id="cardTotalSemesters">
+          <div class="stat-info">
+            <span class="stat-label">Semesters</span>
+            <span class="stat-number" id="statTotalSemesters"><i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem;"></i></span>
+          </div>
+          <div class="stat-icon-wrapper stat-icon-amber">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- Quick Actions Section -->
+    <section aria-labelledby="quickActionsHeading">
+      <h2 class="section-title" id="quickActionsHeading">
+        <i class="fa-solid fa-bolt" style="color: var(--accent-teal);"></i> Quick Actions
+      </h2>
+      <div class="quick-actions-grid">
+        
+        <a href="/add-course.html" class="action-card" id="actionCardAdd">
+          <div class="action-card-icon">
+            <i class="fa-solid fa-plus"></i>
+          </div>
+          <div class="action-card-title">Add a New Course</div>
+          <div class="action-card-desc">Register a new curriculum course with department, credit, and semester details.</div>
+          <div class="action-card-arrow">Register Course <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+
+        <a href="/view-courses.html" class="action-card" id="actionCardView">
+          <div class="action-card-icon">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div class="action-card-title">View All Courses</div>
+          <div class="action-card-desc">Search, filter, and inspect complete course directory in a responsive table.</div>
+          <div class="action-card-arrow">Explore Catalog <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+
+        <a href="/update-course.html" class="action-card" id="actionCardUpdate">
+          <div class="action-card-icon">
+            <i class="fa-solid fa-pen-nib"></i>
+          </div>
+          <div class="action-card-title">Update Course Details</div>
+          <div class="action-card-desc">Modify existing course specifications, credits, or department assignments.</div>
+          <div class="action-card-arrow">Edit Record <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+
+        <a href="/delete-course.html" class="action-card" id="actionCardDelete">
+          <div class="action-card-icon">
+            <i class="fa-solid fa-trash-arrow-up"></i>
+          </div>
+          <div class="action-card-title">Delete a Course</div>
+          <div class="action-card-desc">Safely verify and remove retired courses with explicit confirmation.</div>
+          <div class="action-card-arrow">Remove Course <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- Recent Courses Section -->
+    <section class="card" aria-labelledby="recentCoursesHeading">
+      <div class="card-header">
+        <h2 class="card-title" id="recentCoursesHeading" style="margin-bottom: 0;">
+          <i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-teal); margin-right: 0.5rem;"></i>
+          Recently Added Courses
+        </h2>
+        <a href="/view-courses.html" class="btn btn-secondary btn-sm" id="viewAllCoursesBtn">
+          View All <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- Loading State -->
+      <div id="recentCoursesLoading" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>Loading course directory from database...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div id="recentCoursesEmpty" class="empty-state hidden">
+        <img src="/images/empty-courses.svg" alt="No courses found" class="empty-state-img">
+        <h3 class="empty-state-title">No Courses Available</h3>
+        <p class="empty-state-desc">Your MySQL course catalog currently has no courses registered. Get started by registering your first academic course.</p>
+        <a href="/add-course.html" class="btn btn-teal">
+          <i class="fa-solid fa-plus"></i> Add First Course
+        </a>
+      </div>
+
+      <!-- Table Container -->
+      <div id="recentCoursesTableContainer" class="table-responsive hidden">
+        <table class="courses-table" id="recentCoursesTable">
+          <thead>
+            <tr>
+              <th scope="col">Course ID</th>
+              <th scope="col">Course Name</th>
+              <th scope="col">Credits</th>
+              <th scope="col">Department</th>
+              <th scope="col">Semester</th>
+              <th scope="col" style="text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recentCoursesTableBody">
+            <!-- Dynamically populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <i class="fa-solid fa-graduation-cap"></i> CourseHub — Academic Course Management System
+      </div>
+      <div class="footer-status">
+        <span class="status-dot"></span>
+        <span>MySQL Database Connected</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Frontend Logic for Dashboard -->
+  <script>
+    // Mobile navigation toggle
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinksList');
+    if (mobileBtn && navLinks) {
+      mobileBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('show-mobile');
+      });
+    }
+
+    // Helper: Escape untrusted text for safe HTML rendering
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Fetch and render dashboard statistics
+    async function fetchDashboardStats() {
+      const alertBox = document.getElementById('statusAlert');
+      const alertMsg = document.getElementById('statusAlertMessage');
+
+      try {
+        const response = await fetch('/api/dashboard/stats');
+        if (!response.ok) {
+          throw new Error(`Server returned HTTP ${response.status}`);
+        }
+        const data = await response.json();
+
+        document.getElementById('statTotalCourses').textContent = data.totalCourses.toLocaleString();
+        document.getElementById('statTotalCredits').textContent = data.totalCredits.toLocaleString();
+        document.getElementById('statTotalDepartments').textContent = data.totalDepartments.toLocaleString();
+        document.getElementById('statTotalSemesters').textContent = data.totalSemesters.toLocaleString();
+        
+        alertBox.classList.add('hidden');
+      } catch (err) {
+        console.error('Failed to load dashboard statistics:', err);
+        document.getElementById('statTotalCourses').textContent = '0';
+        document.getElementById('statTotalCredits').textContent = '0';
+        document.getElementById('statTotalDepartments').textContent = '0';
+        document.getElementById('statTotalSemesters').textContent = '0';
+        
+        alertMsg.textContent = 'Cannot connect to database backend: ' + err.message + '. Ensure Express server is running and MySQL credentials in .env are correct.';
+        alertBox.classList.remove('hidden');
+      }
+    }
+
+    // Fetch and render recent courses
+    async function fetchRecentCourses() {
+      const loadingEl = document.getElementById('recentCoursesLoading');
+      const emptyEl = document.getElementById('recentCoursesEmpty');
+      const tableContainer = document.getElementById('recentCoursesTableContainer');
+      const tbody = document.getElementById('recentCoursesTableBody');
+
+      try {
+        const response = await fetch('/api/courses/recent');
+        if (!response.ok) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+        const courses = await response.json();
+
+        loadingEl.classList.add('hidden');
+
+        if (!Array.isArray(courses) || courses.length === 0) {
+          emptyEl.classList.remove('hidden');
+          tableContainer.classList.add('hidden');
+          return;
+        }
+
+        emptyEl.classList.add('hidden');
+        tableContainer.classList.remove('hidden');
+        tbody.innerHTML = '';
+
+        courses.forEach(course => {
+          const tr = document.createElement('tr');
+          const safeId = encodeURIComponent(course.course_id);
+
+          tr.innerHTML = `
+            <td class="course-id-cell">${escapeHtml(course.course_id)}</td>
+            <td class="course-name-cell">${escapeHtml(course.course_name)}</td>
+            <td><span class="course-credits-badge">${escapeHtml(course.course_creidts)} Credits</span></td>
+            <td><span class="badge badge-dept">${escapeHtml(course.course_dept)}</span></td>
+            <td><span class="badge badge-info">${escapeHtml(course.course_semister)}</span></td>
+            <td style="text-align: center;">
+              <div class="table-actions" style="justify-content: center;">
+                <a href="/update-course.html?id=${safeId}" class="btn-icon btn-icon-edit" title="Edit Course" aria-label="Edit Course">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+                <a href="/delete-course.html?id=${safeId}" class="btn-icon btn-icon-delete" title="Delete Course" aria-label="Delete Course">
+                  <i class="fa-solid fa-trash-can"></i>
+                </a>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      } catch (err) {
+        console.error('Failed to load recent courses:', err);
+        loadingEl.classList.add('hidden');
+        emptyEl.classList.remove('hidden');
+      }
+    }
+
+    // Initialize Dashboard on DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchDashboardStats();
+      fetchRecentCourses();
+    });
+  </script>
+</body>
+</html>

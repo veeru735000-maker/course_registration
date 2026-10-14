@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CourseHub — Delete Course</title>
+  <meta name="description" content="Safely locate, verify, and delete academic courses with explicit confirmation.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="mainNavbar">
+    <div class="container nav-container">
+      <a href="/index.html" class="brand">
+        <img src="/images/logo.png" alt="CourseHub Logo" class="brand-logo-img" onerror="this.style.display='none'; document.getElementById('fallbackIcon').style.display='inline-block';">
+        <i class="fa-solid fa-graduation-cap" id="fallbackIcon" style="display:none; font-size: 1.8rem; color: var(--sunset-orange);"></i>
+        <div class="brand-text">
+          <span class="brand-title">CourseHub</span>
+          <span class="brand-subtitle">Registration System</span>
+        </div>
+      </a>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinksList">
+        <li><a href="/index.html" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="/add-course.html" class="nav-link"><i class="fa-solid fa-plus-circle"></i> Add Course</a></li>
+        <li><a href="/view-courses.html" class="nav-link"><i class="fa-solid fa-table-list"></i> View Courses</a></li>
+        <li><a href="/update-course.html" class="nav-link"><i class="fa-solid fa-pen-to-square"></i> Update Course</a></li>
+        <li><a href="/delete-course.html" class="nav-link active"><i class="fa-solid fa-trash-can"></i> Delete Course</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container" style="flex: 1; padding-bottom: 3rem;">
+
+    <!-- Page Header -->
+    <header class="page-header">
+      <div class="page-header-row">
+        <div>
+          <h1 class="page-title"><i class="fa-solid fa-trash-can" style="color: var(--danger-color);"></i> Delete Course</h1>
+          <p class="page-subtitle">Locate an academic course to preview details and confirm permanent removal from the MySQL database.</p>
+        </div>
+        <div>
+          <a href="/view-courses.html" class="btn btn-secondary">
+            <i class="fa-solid fa-table-list"></i> View All Courses
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Feedback Alerts -->
+    <div id="alertSuccess" class="alert alert-success hidden" role="alert">
+      <i class="fa-solid fa-circle-check alert-icon"></i>
+      <div id="alertSuccessMsg">Course deleted successfully.</div>
+    </div>
+
+    <div id="alertError" class="alert alert-danger hidden" role="alert">
+      <i class="fa-solid fa-circle-exclamation alert-icon"></i>
+      <div id="alertErrorMsg">Failed to locate or delete course.</div>
+    </div>
+
+    <!-- Course Search Input Card -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 1.5rem auto;">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-magnifying-glass"></i> Find Course to Delete</h2>
+      </div>
+      <form id="searchDeleteForm" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+        <div class="form-group" style="flex: 1; min-width: 200px;">
+          <label for="deleteIdInput" class="form-label">
+            <span>Enter Course ID <span class="required-badge">*</span></span>
+          </label>
+          <input 
+            type="text" 
+            id="deleteIdInput" 
+            class="input-control" 
+            placeholder="e.g. 101 or CS101" 
+            required 
+            autocomplete="off"
+          >
+        </div>
+        <button type="submit" id="searchDeleteBtn" class="btn btn-primary" style="height: 44px;">
+          <i class="fa-solid fa-magnifying-glass"></i> Search Course
+        </button>
+      </form>
+    </div>
+
+    <!-- Loading State -->
+    <div id="deleteLoading" class="loading-indicator hidden">
+      <div class="spinner"></div>
+      <p>Locating course in database...</p>
+    </div>
+
+    <!-- Course Details Preview & Deletion Card -->
+    <div id="coursePreviewCard" class="card hidden" style="max-width: 800px; margin: 0 auto 2.5rem auto;">
+      
+      <!-- Warning Callout -->
+      <div class="warning-callout">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>
+          <strong>Caution: Permanent Action</strong>
+          <p style="font-size: 0.88rem; margin-top: 0.2rem;">
+            Deleting this course will permanently remove it from the MySQL catalog. This action cannot be undone. Please confirm the course details below.
+          </p>
+        </div>
+      </div>
+
+      <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+        <h2 class="card-title"><i class="fa-solid fa-id-card"></i> Course Details Preview</h2>
+      </div>
+
+      <!-- Detail Grid -->
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="detail-label">Course ID</span>
+          <span class="detail-value" id="previewCourseId">-</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Credits</span>
+          <span class="detail-value" id="previewCourseCredits">-</span>
+        </div>
+        <div class="detail-item" style="grid-column: 1 / -1;">
+          <span class="detail-label">Course Name</span>
+          <span class="detail-value" id="previewCourseName" style="font-size: 1.2rem; color: var(--danger-color);">-</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Department</span>
+          <span class="detail-value" id="previewCourseDept">-</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Semester</span>
+          <span class="detail-value" id="previewCourseSem">-</span>
+        </div>
+      </div>
+
+      <!-- Confirmation Checkbox & Action Buttons -->
+      <div style="background-color: #fff1f2; border: 1px solid #fecdd3; padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+        <label style="display: flex; align-items: center; gap: 0.65rem; cursor: pointer; font-weight: 600; color: #9f1239; font-size: 0.95rem;">
+          <input type="checkbox" id="confirmCheckbox" style="width: 18px; height: 18px; cursor: pointer;">
+          I understand and confirm that I want to permanently delete this course from MySQL.
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" id="deleteConfirmBtn" class="btn btn-danger" disabled>
+          <i class="fa-solid fa-trash-can"></i> Confirm & Delete Course
+        </button>
+        <a href="/view-courses.html" class="btn btn-secondary">
+          <i class="fa-solid fa-xmark"></i> Cancel & Return to Catalog
+        </a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <i class="fa-solid fa-graduation-cap"></i> CourseHub — Academic Course Management System
+      </div>
+      <div class="footer-status">
+        <span class="status-dot"></span>
+        <span>MySQL Database Connected</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Frontend Logic for Delete Course -->
+  <script>
+    // Mobile navigation toggle
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinksList');
+    if (mobileBtn && navLinks) {
+      mobileBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('show-mobile');
+      });
+    }
+
+    // Elements
+    const searchForm = document.getElementById('searchDeleteForm');
+    const deleteIdInput = document.getElementById('deleteIdInput');
+    const searchBtn = document.getElementById('searchDeleteBtn');
+    const deleteLoading = document.getElementById('deleteLoading');
+    
+    const coursePreviewCard = document.getElementById('coursePreviewCard');
+    const previewCourseId = document.getElementById('previewCourseId');
+    const previewCourseName = document.getElementById('previewCourseName');
+    const previewCourseCredits = document.getElementById('previewCourseCredits');
+    const previewCourseDept = document.getElementById('previewCourseDept');
+    const previewCourseSem = document.getElementById('previewCourseSem');
+
+    const confirmCheckbox = document.getElementById('confirmCheckbox');
+    const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertSuccessMsg = document.getElementById('alertSuccessMsg');
+    const alertError = document.getElementById('alertError');
+    const alertErrorMsg = document.getElementById('alertErrorMsg');
+
+    let currentLoadedCourse = null;
+
+    function hideAlerts() {
+      alertSuccess.classList.add('hidden');
+      alertError.classList.add('hidden');
+    }
+
+    function showError(message) {
+      alertErrorMsg.textContent = message;
+      alertError.classList.remove('hidden');
+      alertSuccess.classList.add('hidden');
+    }
+
+    function showSuccess(message) {
+      alertSuccessMsg.textContent = message;
+      alertSuccess.classList.remove('hidden');
+      alertError.classList.add('hidden');
+    }
+
+    // Lookup course by ID (Searching NEVER deletes)
+    async function loadCourseForDeletion(courseId) {
+      hideAlerts();
+      currentLoadedCourse = null;
+      coursePreviewCard.classList.add('hidden');
+      confirmCheckbox.checked = false;
+      deleteConfirmBtn.disabled = true;
+
+      if (!courseId) {
+        showError('Please enter a Course ID to search.');
+        return;
+      }
+
+      deleteLoading.classList.remove('hidden');
+      searchBtn.disabled = true;
+
+      try {
+        const response = await fetch(`/api/courses/${encodeURIComponent(courseId)}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || `Course ID '${courseId}' was not found in MySQL.`);
+        }
+
+        currentLoadedCourse = data;
+        previewCourseId.textContent = data.course_id;
+        previewCourseName.textContent = data.course_name;
+        previewCourseCredits.textContent = data.course_creidts + ' Credits';
+        previewCourseDept.textContent = data.course_dept;
+        previewCourseSem.textContent = data.course_semister;
+
+        coursePreviewCard.classList.remove('hidden');
+
+      } catch (err) {
+        console.error('Lookup failed:', err);
+        showError(err.message);
+      } finally {
+        deleteLoading.classList.add('hidden');
+        searchBtn.disabled = false;
+      }
+    }
+
+    // Checkbox toggle requirement
+    confirmCheckbox.addEventListener('change', () => {
+      deleteConfirmBtn.disabled = !(confirmCheckbox.checked && currentLoadedCourse);
+    });
+
+    // Form search event
+    searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = deleteIdInput.value.trim();
+      loadCourseForDeletion(id);
+    });
+
+    // Deletion confirmation button click
+    deleteConfirmBtn.addEventListener('click', async () => {
+      if (!currentLoadedCourse || !confirmCheckbox.checked) {
+        showError('Please check the confirmation box before deleting.');
+        return;
+      }
+
+      const idToDelete = currentLoadedCourse.course_id;
+      const courseNameToDelete = currentLoadedCourse.course_name;
+
+      const originalBtnHtml = deleteConfirmBtn.innerHTML;
+      deleteConfirmBtn.disabled = true;
+      deleteConfirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting from MySQL...';
+
+      try {
+        const response = await fetch(`/api/courses/${encodeURIComponent(idToDelete)}`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Server error occurred during deletion.');
+        }
+
+        // Successfully deleted
+        coursePreviewCard.classList.add('hidden');
+        currentLoadedCourse = null;
+        confirmCheckbox.checked = false;
+        deleteIdInput.value = '';
+
+        showSuccess(`Course "${courseNameToDelete}" (ID: ${idToDelete}) has been permanently removed from the MySQL database!`);
+
+      } catch (err) {
+        console.error('Delete failed:', err);
+        showError(err.message || 'Unable to delete course.');
+        deleteConfirmBtn.disabled = false;
+      } finally {
+        deleteConfirmBtn.innerHTML = originalBtnHtml;
+      }
+    });
+
+    // Check for query parameter on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramId = urlParams.get('id');
+      if (paramId) {
+        deleteIdInput.value = paramId;
+        loadCourseForDeletion(paramId);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f4f8"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background Base Circle -->
+  <circle cx="250" cy="200" r="160" fill="url(#bgGrad)" />
+  <circle cx="250" cy="200" r="130" fill="#ffffff" opacity="0.6"/>
+
+  <!-- Main Floating Document / Folder -->
+  <g filter="url(#cardShadow)">
+    <rect x="140" y="100" width="220" height="170" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    
+    <!-- Document Header Tab -->
+    <path d="M 140 116 C 140 107.16 147.16 100 156 100 L 220 100 L 235 115 L 344 115 C 352.84 115 360 122.16 360 131 L 360 145 L 140 145 Z" fill="#0f2744"/>
+    
+    <!-- Window dots -->
+    <circle cx="160" cy="122" r="4" fill="#38bdf8"/>
+    <circle cx="175" cy="122" r="4" fill="#38bdf8" opacity="0.6"/>
+    <circle cx="190" cy="122" r="4" fill="#38bdf8" opacity="0.3"/>
+    
+    <!-- Placeholder Content Lines -->
+    <rect x="170" y="170" width="160" height="10" rx="5" fill="#e2e8f0"/>
+    <rect x="170" y="195" width="120" height="10" rx="5" fill="#f1f5f9"/>
+    <rect x="170" y="220" width="140" height="10" rx="5" fill="#f1f5f9"/>
+    
+    <!-- Academic Cap Icon in Folder -->
+    <g transform="translate(230, 160) scale(0.9)">
+      <polygon points="20,0 45,12 20,24 -5,12" fill="url(#tealGrad)" opacity="0.9"/>
+      <path d="M 7 18 L 7 32 C 7 36 33 36 33 32 L 33 18" fill="none" stroke="#0891b2" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 37 15 L 43 28 L 41 36" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="41" cy="37" r="3" fill="#f59e0b"/>
+    </g>
+  </g>
+
+  <!-- Big Magnifying Glass Inspecting Empty State -->
+  <g transform="translate(285, 175) rotate(-15)">
+    <circle cx="50" cy="50" r="42" fill="#ffffff" stroke="url(#blueGrad)" stroke-width="7"/>
+    <circle cx="50" cy="50" r="34" fill="#e0f2fe" opacity="0.45"/>
+    <line x1="80" y1="80" x2="135" y2="135" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
+    <line x1="80" y1="80" x2="135" y2="135" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round"/>
+    <!-- Question mark inside glass -->
+    <text x="50" y="62" font-family="'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="bold" fill="#0284c7" text-anchor="middle">?</text>
+  </g>
+
+  <!-- Floating subtle decorative elements -->
+  <circle cx="110" cy="140" r="8" fill="#0ea5e9" opacity="0.4"/>
+  <circle cx="390" cy="120" r="12" fill="#06b6d4" opacity="0.3"/>
+  <circle cx="100" cy="270" r="6" fill="#64748b" opacity="0.3"/>
+  <circle cx="390" cy="290" r="10" fill="#38bdf8" opacity="0.4"/>
+  <rect x="125" y="225" width="12" height="12" rx="3" fill="#f59e0b" opacity="0.5" transform="rotate(25 131 231)"/>
+  <rect x="365" y="195" width="10" height="10" rx="2" fill="#6366f1" opacity="0.4" transform="rotate(45 370 200)"/>
+
+  <!-- Ground shadow -->
+  <ellipse cx="250" cy="335" rx="140" ry="12" fill="#cbd5e1" opacity="0.5"/>
+</svg>
